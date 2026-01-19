@@ -32,7 +32,7 @@
           </ion-item>
 
 
-          <ion-item fill="outline">
+          <ion-item fill="outline" class="ion-margin-bottom">
             <ion-label position="stacked">Goldback Total (Gb)</ion-label>
             <ion-input
               class="gb-value"
@@ -45,7 +45,7 @@
         </ion-card-content>
       </ion-card>
 
-      <div v-if="gbAmount" class="ion-padding-top">
+      <div v-if="gbAmount" class="ion-margin-top">
         <div class="results-dashboard">
           <h3 class="ion-text-center ion-no-margin ion-margin-bottom" style="font-size: 1.1em; color: var(--ion-color-medium); text-transform: uppercase; letter-spacing: 1px;">How to Pay</h3>
           <div class="values-container">
