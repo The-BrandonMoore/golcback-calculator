@@ -47,7 +47,9 @@
 
       <div v-if="gbAmount" class="ion-margin-top">
         <div class="results-dashboard">
-          <div class="total-row ion-margin-bottom">Total Due: ${{ usdAmount }}</div>
+          <div class="total-command-center">
+            <div class="total-row">Total Due: <span class="total-value">${{ usdAmount }}</span></div>
+          </div>
           <div class="values-container">
             <div class="result-item gold-glow">
               <span class="currency-label">Physical Goldbacks</span>
@@ -188,12 +190,12 @@ ion-card {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4px 0;
+  padding: 12px 0;
 }
 .main-title {
   font-weight: 700;
   letter-spacing: -0.5px;
-  font-size: 1.4rem;
+  font-size: 1.7rem;
   line-height: 1.2;
   background: linear-gradient(to right, #D4AF37, #F7EF8A);
   -webkit-background-clip: text;
@@ -298,16 +300,25 @@ ion-card {
   color: var(--ion-color-medium);
   margin: 0 8px;
 }
+.total-command-center {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+  border-top: 1px solid rgba(212, 175, 55, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 12px 12px 0 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
 .total-row {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--ion-color-medium);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 8px 12px;
-  display: inline-block;
   letter-spacing: 0.5px;
+}
+.total-value {
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+  color: white;
 }
 .cash-chip {
   --background: #1B5E20;
