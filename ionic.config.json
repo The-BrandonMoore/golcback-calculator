@@ -1,0 +1,7 @@
+{
+  "name": "GoldbackConverter",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
