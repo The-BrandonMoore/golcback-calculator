@@ -45,6 +45,12 @@
                   <div class="usd-value medium-emerald">${{ remainingChangeUSD }}</div>
                 </div>
               </div>
+              <div class="ion-margin-top">
+                <ion-button fill="outline" color="primary" @click="copyReceipt">
+                  <ion-icon slot="start" :icon="copyOutline"></ion-icon>
+                  Copy Receipt
+                </ion-button>
+              </div>
 
             </div>
             <div v-else class="ion-text-center">
@@ -60,12 +66,13 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue';
 import {
-  IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButtons, IonBackButton,
+  IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButtons, IonBackButton, IonButton,
   IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
   IonCardContent, IonItem, IonLabel, IonInput, IonList, IonChip, IonIcon,
-  createAnimation
+  createAnimation, toastController
 } from '@ionic/vue';
-import { cashOutline } from 'ionicons/icons';
+import { cashOutline, copyOutline } from 'ionicons/icons';
+import { Clipboard } from '@capacitor/clipboard';
 
 // Data State
 const dailyRate = ref(9.21); // Jan 2026 Rate
@@ -139,6 +146,44 @@ const playEntranceAnimation = async () => {
       .fromTo('opacity', '0', '1');
     await animation.play();
   }
+};
+
+const copyReceipt = async () => {
+  const date = new Date().toLocaleString();
+  let receiptText = `Goldback Transaction Receipt\n`;
+  receiptText += `Date: ${date}\n`;
+  receiptText += `Rate: $${dailyRate.value}/Gb\n`;
+  receiptText += `------------------------\n`;
+  receiptText += `Amount Owed: $${Number(amountOwedUSD.value).toFixed(2)}\n`;
+  receiptText += `Tendered: ${amountTenderedGB.value} Gb\n`;
+  receiptText += `Change Due: ${changeDueGB.value} Gb\n`;
+
+  if (changeBreakdown.value.length > 0) {
+    receiptText += `\nBill Breakdown:\n`;
+    changeBreakdown.value.forEach(bill => {
+      receiptText += `- ${bill.count} x ${bill.label} Gb\n`;
+    });
+  }
+
+  if (remainingChangeUSD.value) {
+    receiptText += `\nRemaining USD Change: $${remainingChangeUSD.value}\n`;
+  }
+
+  receiptText += `------------------------\n`;
+  receiptText += `Calculated via Goldback Converter`;
+
+  await Clipboard.write({
+    string: receiptText
+  });
+
+  const toast = await toastController.create({
+    message: 'Receipt Copied to Clipboard',
+    duration: 2000,
+    position: 'bottom',
+    color: 'success'
+  });
+
+  await toast.present();
 };
 
 watch(changeDueGB, (newValue) => {
