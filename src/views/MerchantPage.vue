@@ -29,18 +29,23 @@
 
           <div v-if="changeDueGB !== null && amountOwedUSD && amountTenderedGB" class="ion-padding-top">
             <div v-if="changeDueGB >= 0" class="ion-text-center">
-              <h2>Change Due: <span class="gb-value">{{ changeDueGB }}</span> Gb</h2>
-              <div class="ion-margin-bottom">
-                <ion-chip v-for="bill in changeBreakdown" :key="bill.label" :style="getBillStyle(bill.label)">
-                  <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
-                  <ion-label style="color: white"><span class="gb-value">{{ bill.count }}</span> x <span class="gb-value">{{ bill.label }}</span></ion-label>
-                </ion-chip>
+              <div class="results-dashboard">
+                <div class="result-item">
+                    <span class="currency-label">Goldbacks</span>
+                    <div class="gb-value large-gold">{{ changeDueGB }}<span class="unit">Gb</span></div>
+                    <div class="ion-margin-bottom ion-margin-top">
+                        <ion-chip v-for="bill in changeBreakdown" :key="bill.label" :style="getBillStyle(bill.label)">
+                        <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
+                        <ion-label style="color: white"><span class="gb-value">{{ bill.count }}</span> x <span class="gb-value">{{ bill.label }}</span></ion-label>
+                    </ion-chip>
+                    </div>
+                </div>
+                <div v-if="remainingChangeUSD" class="result-item ion-margin-top">
+                  <span class="currency-label">USD</span>
+                  <div class="usd-value medium-emerald">${{ remainingChangeUSD }}</div>
+                </div>
               </div>
-              <ion-list lines="none" v-if="remainingChangeUSD">
-                <ion-item>
-                  <ion-label color="medium">Remaining Change in USD: <span class="usd-value">${{ remainingChangeUSD }}</span></ion-label>
-                </ion-item>
-              </ion-list>
+
             </div>
             <div v-else class="ion-text-center">
               <h3 style="color: var(--ion-color-danger);">Remaining Due: {{ Math.abs(changeDueGB) }} Gb</h3>
@@ -160,5 +165,42 @@ ion-toolbar {
   border: 1px solid;
   border-image: linear-gradient(to bottom right, rgba(212, 175, 55, 0.3), transparent) 1;
   box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.results-dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.result-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.currency-label {
+  font-size: 0.7rem;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+.large-gold {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #D4AF37;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.medium-emerald {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2E7D32;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.unit {
+  font-size: 0.5em;
+  margin-left: 2px;
+  opacity: 0.8;
 }
 </style>
