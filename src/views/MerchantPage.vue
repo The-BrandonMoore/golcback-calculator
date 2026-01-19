@@ -35,12 +35,12 @@
             <div v-if="changeDueGB >= 0" class="ion-text-center">
               <div class="results-dashboard">
                 <div class="total-command-center">
-                  <div class="total-row">Total Change: <span class="total-value">{{ changeDueGB }} Gb</span></div>
+                  <div class="total-row">Total Change: <span class="total-value">{{ changeDueGB?.toFixed(2) }} Gb</span></div>
                 </div>
                 <div class="values-container">
                   <div class="result-item gold-glow">
                       <span class="currency-label">Physical Goldbacks</span>
-                      <div class="gb-value large-gold">{{ physicalChangeGB }}<span class="unit">Gb</span></div>
+                      <div class="gb-value large-gold">{{ physicalChangeGB.toFixed(2) }}<span class="unit">Gb</span></div>
                   </div>
                   <div v-if="remainingChangeUSD" class="plus-sign">+</div>
                   <div v-if="remainingChangeUSD" class="result-item green-glow">
@@ -97,11 +97,11 @@
             <div class="step-section">
               <div class="step-label">Payment </div>
               <div class="math-equation">
-                <span class="math-value">{{ amountTenderedGB }} Gb</span>
+                <span class="math-value">{{ Number(amountTenderedGB).toFixed(2) }} Gb</span>
                 <span class="math-operator">-</span>
                 <span class="math-value">{{ totalGbNeeded }} Gb</span>
                 <span class="math-operator">=</span>
-                <span class="math-result final-result">{{ changeDueGB }} Gb</span>
+                <span class="math-result final-result">{{ changeDueGB?.toFixed(2) }} Gb</span>
               </div>
               <div class="step-sublabel">Amount Paid  -  Amount Due  =  Change Due</div>
             </div>
@@ -113,7 +113,7 @@
                 <div class="values-container">
                   <div class="result-item gold-glow">
                     <span class="currency-label">Physical Gold</span>
-                    <div class="gb-value large-gold">{{ physicalChangeGB }}<span class="unit">Gb</span></div>
+                    <div class="gb-value large-gold">{{ physicalChangeGB.toFixed(2) }}<span class="unit">Gb</span></div>
                   </div>
                   <div v-if="remainingChangeUSD" class="plus-sign">+</div>
                   <div v-if="remainingChangeUSD" class="result-item green-glow">
@@ -457,6 +457,8 @@ watch(changeDueGB, (newValue) => {
 .math-value {
   color: white;
   font-weight: 600;
+  min-width: 70px;
+  text-align: center;
 }
 .rate-highlight {
   background: rgba(212, 175, 55, 0.15);
@@ -471,6 +473,8 @@ watch(changeDueGB, (newValue) => {
 .math-result {
   color: #4CAF50;
   font-weight: 800;
+  min-width: 70px;
+  text-align: center;
 }
 .final-result {
   font-size: 1.2em;

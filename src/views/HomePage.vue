@@ -48,12 +48,12 @@
       <div v-if="gbAmount" class="ion-margin-top">
         <div class="results-dashboard">
           <div class="total-command-center">
-            <div class="total-row">Total Due: <span class="total-value">${{ usdAmount }}</span></div>
+            <div class="total-row">Total Due: <span class="total-value">${{ Number(usdAmount).toFixed(2) }}</span></div>
           </div>
           <div class="values-container">
             <div class="result-item gold-glow">
               <span class="currency-label">Physical Goldbacks</span>
-              <div class="gb-value large-gold">{{ physicalGbTotal }}<span class="unit">Gb</span></div>
+              <div class="gb-value large-gold">{{ physicalGbTotal.toFixed(2) }}<span class="unit">Gb</span></div>
             </div>
             <div class="plus-sign">+</div>
             <div class="result-item green-glow">
@@ -214,6 +214,7 @@ ion-card {
   --border-radius: 8px;
   font-weight: 600;
   margin-right: 8px;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
 }
 .glassmorphism-card {
   background: rgba(30, 30, 30, 0.7);
