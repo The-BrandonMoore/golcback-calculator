@@ -28,7 +28,14 @@
             <ion-label position="stacked">Amount Tendered (Gb)</ion-label>
             <ion-input class="gb-value" type="number" v-model="amountTenderedGB" placeholder="0.00"></ion-input>
           </ion-item>
-                 </ion-card-content>
+
+          <div class="ion-text-center ion-margin-top" v-if="amountOwedUSD || amountTenderedGB">
+            <ion-button class="clear-form-btn" fill="clear" size="small" @click="clearForm">
+              <ion-icon slot="start" :icon="trashOutline"></ion-icon>
+              Clear Form
+            </ion-button>
+          </div>
+        </ion-card-content>
       </ion-card>
 
           <div v-if="changeDueGB !== null" class="ion-margin-top" ref="changeResultCard">
@@ -142,7 +149,7 @@ import {
   IonCardContent, IonItem, IonLabel, IonInput, IonList, IonChip, IonIcon, IonModal,
   createAnimation, toastController
 } from '@ionic/vue';
-import { cashOutline, copyOutline, receiptOutline, timeOutline, logoUsd } from 'ionicons/icons';
+import { cashOutline, copyOutline, receiptOutline, timeOutline, logoUsd, trashOutline } from 'ionicons/icons';
 import { Clipboard } from '@capacitor/clipboard';
 
 // Data State
@@ -281,6 +288,11 @@ const copyReceipt = async () => {
   });
 
   await toast.present();
+};
+
+const clearForm = () => {
+  amountOwedUSD.value = null;
+  amountTenderedGB.value = null;
 };
 
 watch(changeDueGB, (newValue) => {
@@ -522,5 +534,11 @@ watch(changeDueGB, (newValue) => {
 .cash-chip {
   --background: #1B5E20;
   border: 1px solid #2E7D32;
+}
+.clear-form-btn {
+  --color: #DC143C;
+  --background-hover: rgba(220, 20, 60, 0.1);
+  --background-activated: rgba(220, 20, 60, 0.1);
+  text-shadow: 0 0 8px rgba(220, 20, 60, 0.4);
 }
 </style>

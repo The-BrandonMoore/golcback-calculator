@@ -42,6 +42,13 @@
               placeholder="0.00"
             ></ion-input>
           </ion-item>
+
+          <div class="ion-text-center ion-margin-top" v-if="usdAmount || gbAmount">
+            <ion-button class="clear-form-btn" fill="clear" size="small" @click="clearForm">
+              <ion-icon slot="start" :icon="trashOutline"></ion-icon>
+              Clear Form
+            </ion-button>
+          </div>
         </ion-card-content>
       </ion-card>
 
@@ -91,7 +98,7 @@ import {
   IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
   IonCardContent, IonItem, IonLabel, IonInput, IonIcon, IonButton, IonButtons, IonChip
 } from '@ionic/vue';
-import { cashOutline, calculatorOutline, logoUsd } from 'ionicons/icons';
+import { cashOutline, calculatorOutline, logoUsd, trashOutline } from 'ionicons/icons';
 import { swapVertical } from 'ionicons/icons';
 
 // Data State
@@ -167,6 +174,11 @@ const convertToUSD = () => {
   } else {
     usdAmount.value = null;
   }
+};
+
+const clearForm = () => {
+  usdAmount.value = null;
+  gbAmount.value = null;
 };
 </script>
 
@@ -324,5 +336,11 @@ ion-card {
 .cash-chip {
   --background: #1B5E20;
   border: 1px solid #2E7D32;
+}
+.clear-form-btn {
+  --color: #DC143C;
+  --background-hover: rgba(220, 20, 60, 0.1);
+  --background-activated: rgba(220, 20, 60, 0.1);
+  text-shadow: 0 0 8px rgba(220, 20, 60, 0.4);
 }
 </style>
