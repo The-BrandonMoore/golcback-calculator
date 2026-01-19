@@ -23,10 +23,13 @@
             <ion-label position="stacked">Amount Tendered (Gb)</ion-label>
             <ion-input class="gb-value" type="number" v-model="amountTenderedGB" placeholder="0.00"></ion-input>
           </ion-item>
+                 </ion-card-content>
+      </ion-card>
 
-          <div v-if="changeDueGB !== null && amountOwedUSD && amountTenderedGB" class="ion-padding-top">
+          <div v-if="changeDueGB !== null" class="ion-padding-top" ref="changeResultCard">
             <div v-if="changeDueGB >= 0" class="ion-text-center">
               <div class="results-dashboard">
+                <h3 class="ion-text-center" style="font-size: 1.2em; color: var(--ion-color-medium); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;">Change Due</h3>
                 <div class="values-container">
                   <div class="result-item gold-glow">
                       <span class="currency-label">Goldbacks</span>
@@ -46,9 +49,9 @@
                 </div>
               </div>
               <div class="ion-margin-top">
-                <ion-button fill="outline" color="primary" @click="copyReceipt">
-                  <ion-icon slot="start" :icon="copyOutline"></ion-icon>
-                  Copy Receipt
+                <ion-button fill="outline" color="primary" @click="openSettlementModal">
+                  <ion-icon slot="start" :icon="receiptOutline"></ion-icon>
+                  View Settlement
                 </ion-button>
               </div>
 
@@ -57,8 +60,74 @@
               <h3 style="color: var(--ion-color-danger);">Remaining Due: {{ Math.abs(changeDueGB) }} Gb</h3>
             </div>
           </div>
-        </ion-card-content>
-      </ion-card>
+
+
+      <ion-modal :is-open="isModalOpen" :breakpoints="[0, 0.9]" :initial-breakpoint="0.9" @didDismiss="isModalOpen = false" class="settlement-modal">
+        <ion-content class="settlement-content">
+          <div class="settlement-container">
+            <h2 class="settlement-header">Settlement Summary</h2>
+
+            <!-- Step 1 -->
+            <div class="step-section">
+              <div class="step-label">Goldback Conversion Rate</div>
+              <div class="math-equation">
+                <span class="math-value">${{ Number(amountOwedUSD).toFixed(2) }}</span>
+                <span class="math-operator">/</span>
+                <span class="math-value">${{ dailyRate }}</span>
+                <span class="math-operator">=</span>
+                <span class="math-result">{{ totalGbNeeded }} Gb</span>
+              </div>
+              <div class="step-sublabel">Amount Owed / Rate = Total Gb Needed</div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-section">
+              <div class="step-label">Payment </div>
+              <div class="math-equation">
+                <span class="math-value">{{ amountTenderedGB }} Gb</span>
+                <span class="math-operator">-</span>
+                <span class="math-value">{{ totalGbNeeded }} Gb</span>
+                <span class="math-operator">=</span>
+                <span class="math-result">{{ changeDueGB }} Gb</span>
+              </div>
+              <div class="step-sublabel">Amount Paid  -  Amount Due  =  Change Due</div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-section">
+              <div class="step-label">Change Due</div>
+              <div class="results-dashboard">
+                <div class="values-container">
+                  <div class="result-item gold-glow">
+                    <span class="currency-label">Goldbacks</span>
+                    <div class="gb-value large-gold">{{ changeDueGB }}<span class="unit">Gb</span></div>
+                  </div>
+                  <div v-if="remainingChangeUSD" class="separator"></div>
+                  <div v-if="remainingChangeUSD" class="result-item green-glow">
+                    <span class="currency-label">USD</span>
+                    <div class="usd-value medium-emerald">${{ remainingChangeUSD }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 4
+            <div class="step-section" v-if="changeBreakdown.length > 0">
+              <div class="step-label">Step 4: The Notes</div>
+              <div class="ion-text-center ion-margin-top">
+                <ion-chip v-for="bill in changeBreakdown" :key="bill.label" :style="getBillStyle(bill.label)">
+                  <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
+                  <ion-label style="color: white"><span class="gb-value">{{ bill.count }}</span> x <span class="gb-value">{{ bill.label }}</span></ion-label>
+                </ion-chip>
+              </div>
+            </div> -->
+
+            <div class="ion-margin-top">
+              <ion-button expand="block" color="primary" fill="outline" @click="isModalOpen = false">Close</ion-button>
+            </div>
+          </div>
+        </ion-content>
+      </ion-modal>
     </ion-content>
   </ion-page>
 </template>
@@ -68,10 +137,10 @@ import { ref, computed, watch, nextTick } from 'vue';
 import {
   IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButtons, IonBackButton, IonButton,
   IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
-  IonCardContent, IonItem, IonLabel, IonInput, IonList, IonChip, IonIcon,
+  IonCardContent, IonItem, IonLabel, IonInput, IonList, IonChip, IonIcon, IonModal,
   createAnimation, toastController
 } from '@ionic/vue';
-import { cashOutline, copyOutline } from 'ionicons/icons';
+import { cashOutline, copyOutline, receiptOutline } from 'ionicons/icons';
 import { Clipboard } from '@capacitor/clipboard';
 
 // Data State
@@ -79,16 +148,26 @@ const dailyRate = ref(9.21); // Jan 2026 Rate
 const amountOwedUSD = ref();
 const amountTenderedGB = ref();
 const changeResultCard = ref<HTMLElement | null>(null);
+const isModalOpen = ref(false);
 
 const denominations = [50, 25, 10, 5, 1, 0.5]; // Current Goldback bills
 
 const changeDueGB = computed(() => {
-  if (amountOwedUSD.value && amountTenderedGB.value) {
-    const owedInGB = amountOwedUSD.value / dailyRate.value;
-    const change = amountTenderedGB.value - owedInGB;
+  const owed = amountOwedUSD.value;
+  const tendered = amountTenderedGB.value;
+  if (owed !== '' && owed !== null && owed !== undefined && tendered !== '' && tendered !== null && tendered !== undefined) {
+    const owedInGB = Number(owed) / dailyRate.value;
+    const change = Number(tendered) - owedInGB;
     return Number(change.toFixed(2));
   }
   return null;
+});
+
+const totalGbNeeded = computed(() => {
+  if (amountOwedUSD.value && dailyRate.value) {
+    return (amountOwedUSD.value / dailyRate.value).toFixed(2);
+  }
+  return '0.00';
 });
 
 const billCalculation = computed(() => {
@@ -146,6 +225,10 @@ const playEntranceAnimation = async () => {
       .fromTo('opacity', '0', '1');
     await animation.play();
   }
+};
+
+const openSettlementModal = () => {
+  isModalOpen.value = true;
 };
 
 const copyReceipt = async () => {
@@ -269,5 +352,74 @@ ion-toolbar {
   font-size: 0.5em;
   margin-left: 2px;
   opacity: 0.8;
+}
+
+/* Settlement Modal Styles */
+.settlement-modal {
+  --background: rgba(20, 20, 20, 0.95);
+  --border-radius: 20px 20px 0 0;
+}
+.settlement-content {
+  --background: transparent;
+  --color: white;
+}
+.settlement-container {
+  padding: 24px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 16px;
+  margin: 16px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.settlement-header {
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  color: #D4AF37;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 1.2rem;
+}
+.step-section {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.step-section:last-child {
+  border-bottom: none;
+}
+.step-label {
+  font-size: 0.8rem;
+  color: #888;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+.step-sublabel {
+  font-size: 0.7rem;
+  color: #666;
+  margin-top: 4px;
+  text-align: center;
+}
+.math-equation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Inter', monospace;
+  font-size: 1.1rem;
+  flex-wrap: wrap;
+}
+.math-value {
+  color: white;
+  font-weight: 600;
+}
+.math-operator {
+  color: #D4AF37;
+  font-weight: bold;
+}
+.math-result {
+  color: #4CAF50;
+  font-weight: 800;
 }
 </style>

@@ -47,7 +47,7 @@
 
       <div v-if="gbAmount" class="ion-padding-top">
         <div class="results-dashboard">
-          <h3 class="ion-text-center ion-no-margin ion-margin-bottom" style="font-size: 0.9em; color: var(--ion-color-medium); text-transform: uppercase; letter-spacing: 1px;">How to Pay</h3>
+          <h3 class="ion-text-center ion-no-margin ion-margin-bottom" style="font-size: 1.1em; color: var(--ion-color-medium); text-transform: uppercase; letter-spacing: 1px;">How to Pay</h3>
           <div class="values-container">
             <div class="result-item gold-glow">
               <span class="currency-label">Whole Goldbacks</span>
