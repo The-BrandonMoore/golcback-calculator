@@ -53,6 +53,10 @@
                     <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
                     <ion-label style="color: white"><span class="gb-value">{{ bill.count }}</span> x <span class="gb-value">{{ bill.label }}</span></ion-label>
                 </ion-chip>
+                <ion-chip v-if="remainingChangeUSD && parseFloat(remainingChangeUSD) > 0" class="cash-chip">
+                    <ion-icon :icon="logoUsd" style="color: white"></ion-icon>
+                    <ion-label style="color: white"><span class="usd-value">${{ remainingChangeUSD }}</span> USD</ion-label>
+                </ion-chip>
                 </div>
               </div>
               <div class="ion-margin-top">
@@ -118,17 +122,6 @@
               </div>
             </div>
 
-            <!-- Step 4
-            <div class="step-section" v-if="changeBreakdown.length > 0">
-              <div class="step-label">Step 4: The Notes</div>
-              <div class="ion-text-center ion-margin-top">
-                <ion-chip v-for="bill in changeBreakdown" :key="bill.label" :style="getBillStyle(bill.label)">
-                  <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
-                  <ion-label style="color: white"><span class="gb-value">{{ bill.count }}</span> x <span class="gb-value">{{ bill.label }}</span></ion-label>
-                </ion-chip>
-              </div>
-            </div> -->
-
             <div class="ion-margin-top">
               <ion-button expand="block" color="primary" fill="outline" @click="isModalOpen = false">Close</ion-button>
             </div>
@@ -147,7 +140,7 @@ import {
   IonCardContent, IonItem, IonLabel, IonInput, IonList, IonChip, IonIcon, IonModal,
   createAnimation, toastController
 } from '@ionic/vue';
-import { cashOutline, copyOutline, receiptOutline, timeOutline } from 'ionicons/icons';
+import { cashOutline, copyOutline, receiptOutline, timeOutline, logoUsd } from 'ionicons/icons';
 import { Clipboard } from '@capacitor/clipboard';
 
 // Data State
@@ -510,5 +503,9 @@ watch(changeDueGB, (newValue) => {
   padding: 8px 12px;
   display: inline-block;
   letter-spacing: 0.5px;
+}
+.cash-chip {
+  --background: #1B5E20;
+  border: 1px solid #2E7D32;
 }
 </style>

@@ -65,6 +65,10 @@
               <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
               <ion-label><strong>{{ item.count }}</strong> x {{ item.label }} Gb</ion-label>
             </ion-chip>
+            <ion-chip v-if="cashGapUSD && parseFloat(cashGapUSD) > 0" class="cash-chip">
+              <ion-icon :icon="logoUsd" style="color: white"></ion-icon>
+              <ion-label style="color: white"><span class="usd-value">${{ cashGapUSD }}</span> USD</ion-label>
+            </ion-chip>
           </div>
         </div>
       </div>
@@ -85,7 +89,7 @@ import {
   IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
   IonCardContent, IonItem, IonLabel, IonInput, IonIcon, IonButton, IonButtons, IonChip
 } from '@ionic/vue';
-import { cashOutline, calculatorOutline } from 'ionicons/icons';
+import { cashOutline, calculatorOutline, logoUsd } from 'ionicons/icons';
 import { swapVertical } from 'ionicons/icons';
 
 // Data State
@@ -304,5 +308,9 @@ ion-card {
   padding: 8px 12px;
   display: inline-block;
   letter-spacing: 0.5px;
+}
+.cash-chip {
+  --background: #1B5E20;
+  border: 1px solid #2E7D32;
 }
 </style>
