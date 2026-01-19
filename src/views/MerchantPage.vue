@@ -2,9 +2,6 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar color="warning">
-        <ion-buttons slot="start">
-          <ion-back-button default-href="/"></ion-back-button>
-        </ion-buttons>
         <ion-title>Merchant Register</ion-title>
       </ion-toolbar>
     </ion-header>
