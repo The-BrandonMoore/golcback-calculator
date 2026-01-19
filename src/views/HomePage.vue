@@ -45,11 +45,19 @@
         </ion-card-content>
       </ion-card>
 
-      <div v-if="breakdown.length > 0" class="ion-padding-top">
+      <div v-if="gbAmount" class="ion-padding-top">
         <div class="results-dashboard">
-          <div class="result-item gold-glow">
-            <span class="currency-label">Physical Wallet</span>
-            <div class="gb-value large-gold">{{ gbAmount }}<span class="unit">Gb</span></div>
+          <h3 class="ion-text-center ion-no-margin ion-margin-bottom" style="font-size: 0.9em; color: var(--ion-color-medium); text-transform: uppercase; letter-spacing: 1px;">How to Pay</h3>
+          <div class="values-container">
+            <div class="result-item gold-glow">
+              <span class="currency-label">Whole Goldbacks</span>
+              <div class="gb-value large-gold">{{ physicalGbTotal }}<span class="unit">Gb</span></div>
+            </div>
+            <div class="separator"></div>
+            <div class="result-item green-glow">
+              <span class="currency-label">Cash Gap</span>
+              <div class="usd-value medium-emerald">${{ cashGapUSD }}</div>
+            </div>
           </div>
           <div class="ion-margin-top ion-text-center">
             <ion-chip v-for="item in breakdown" :key="item.label" :style="getBillStyle(item.label)">
@@ -99,6 +107,21 @@ const breakdown = computed(() => {
     }
   }
   return result;
+});
+
+const physicalGbTotal = computed(() => {
+  if (!breakdown.value.length) return 0;
+  // Sum up the breakdown to get the total physical notes value
+  const total = breakdown.value.reduce((acc, item) => acc + (item.count * item.label), 0);
+  return Number(total.toFixed(2));
+});
+
+const cashGapUSD = computed(() => {
+  if (!usdAmount.value) return '0.00';
+  const totalUSD = parseFloat(usdAmount.value);
+  const goldValueInUSD = physicalGbTotal.value * dailyRate.value;
+  const gap = totalUSD - goldValueInUSD;
+  return gap > 0 ? gap.toFixed(2) : '0.00';
 });
 
 const getBillStyle = (denomination: number) => {
@@ -158,6 +181,14 @@ ion-toolbar {
   align-items: center;
   justify-content: center;
 }
+.values-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 8px;
+}
 .result-item {
   display: flex;
   flex-direction: column;
@@ -167,6 +198,9 @@ ion-toolbar {
 }
 .gold-glow {
   background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0) 70%);
+}
+.green-glow {
+  background: radial-gradient(circle, rgba(46, 125, 50, 0.25) 0%, rgba(46, 125, 50, 0) 70%);
 }
 .currency-label {
   font-size: 0.7rem;
@@ -181,6 +215,19 @@ ion-toolbar {
   color: #D4AF37;
   line-height: 1;
   font-variant-numeric: tabular-nums;
+}
+.medium-emerald {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2E7D32;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.separator {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.2), transparent);
 }
 .unit {
   font-size: 0.5em;
