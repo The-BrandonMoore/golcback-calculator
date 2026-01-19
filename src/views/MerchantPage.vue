@@ -41,7 +41,8 @@
                     <div class="usd-value medium-emerald">${{ remainingChangeUSD }}</div>
                   </div>
                 </div>
-                <div class="ion-margin-bottom ion-margin-top">
+                <div class="breakdown-header">Recommended Change Breakdown</div>
+                <div class="chip-container ion-margin-bottom">
                     <ion-chip v-for="bill in changeBreakdown" :key="bill.label" :style="getBillStyle(bill.label)">
                     <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
                     <ion-label style="color: white"><span class="gb-value">{{ bill.count }}</span> x <span class="gb-value">{{ bill.label }}</span></ion-label>
@@ -150,7 +151,7 @@ const amountTenderedGB = ref();
 const changeResultCard = ref<HTMLElement | null>(null);
 const isModalOpen = ref(false);
 
-const denominations = [50, 25, 10, 5, 1, 0.5]; // Current Goldback bills
+const denominations = [100, 50, 25, 10, 5, 1, 0.5]; // Current Goldback bills
 
 const changeDueGB = computed(() => {
   const owed = amountOwedUSD.value;
@@ -203,6 +204,7 @@ const calculateBills = (total: number) => {
 
 const getBillStyle = (denomination: number) => {
   const colors: Record<number, string> = {
+    100: '#1A1A1A', // Obsidian
     50: '#D4AF37', // Gold
     25: '#9C27B0', // Purple
     10: '#009688', // Teal
@@ -210,10 +212,14 @@ const getBillStyle = (denomination: number) => {
     1: '#4CAF50',  // Green
     0.5: '#757575' // Gray
   };
-  return {
+  const style: Record<string, string> = {
     '--background': colors[denomination] || 'var(--ion-color-medium)',
     '--color': 'white'
   };
+  if (denomination === 100) {
+    style['border'] = '1px solid #D4AF37';
+  }
+  return style;
 };
 
 const playEntranceAnimation = async () => {
@@ -433,5 +439,18 @@ ion-toolbar {
 .final-result {
   font-size: 1.2em;
   font-weight: 900;
+}
+.breakdown-header {
+  font-size: 0.75rem;
+  color: var(--ion-color-medium);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+.chip-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 </style>

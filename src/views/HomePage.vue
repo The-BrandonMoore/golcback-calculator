@@ -59,7 +59,8 @@
               <div class="usd-value medium-emerald">${{ cashGapUSD }}</div>
             </div>
           </div>
-          <div class="ion-margin-top ion-text-center">
+          <div class="breakdown-header">Suggested Payment Breakdown</div>
+          <div class="chip-container">
             <ion-chip v-for="item in breakdown" :key="item.label" :style="getBillStyle(item.label)">
               <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
               <ion-label><strong>{{ item.count }}</strong> x {{ item.label }} Gb</ion-label>
@@ -92,7 +93,7 @@ const dailyRate = ref(9.21); // Jan 2026 Rate
 const usdAmount = ref();
 const gbAmount = ref();
 
-const denominations = [50, 25, 10, 5, 1, 0.5];
+const denominations = [100, 50, 25, 10, 5, 1, 0.5];
 
 const breakdown = computed(() => {
   if (!gbAmount.value) return [];
@@ -126,6 +127,7 @@ const cashGapUSD = computed(() => {
 
 const getBillStyle = (denomination: number) => {
   const colors: Record<number, string> = {
+    100: '#1A1A1A', // Obsidian
     50: '#D4AF37', // Gold
     25: '#9C27B0', // Purple
     10: '#009688', // Teal
@@ -133,11 +135,15 @@ const getBillStyle = (denomination: number) => {
     1: '#4CAF50',  // Green
     0.5: '#757575' // Gray
   };
-  return {
+  const style: Record<string, string> = {
     '--background': colors[denomination] || 'var(--ion-color-medium)',
     '--color': 'white',
     'font-weight': '600'
   };
+  if (denomination === 100) {
+    style['border'] = '1px solid #D4AF37';
+  }
+  return style;
 };
 
 // Math Logic
@@ -233,5 +239,18 @@ ion-toolbar {
   font-size: 0.5em;
   margin-left: 2px;
   opacity: 0.8;
+}
+.breakdown-header {
+  font-size: 0.75rem;
+  color: var(--ion-color-medium);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+.chip-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 </style>
