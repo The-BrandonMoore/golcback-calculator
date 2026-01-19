@@ -47,15 +47,15 @@
 
       <div v-if="gbAmount" class="ion-margin-top">
         <div class="results-dashboard">
-          <h3 class="ion-text-center ion-no-margin ion-margin-bottom" style="font-size: 1.1em; color: var(--ion-color-medium); text-transform: uppercase; letter-spacing: 1px;">How to Pay</h3>
+          <div class="total-row ion-margin-bottom">Total Due: ${{ usdAmount }}</div>
           <div class="values-container">
             <div class="result-item gold-glow">
-              <span class="currency-label">Whole Goldbacks</span>
+              <span class="currency-label">Physical Goldbacks</span>
               <div class="gb-value large-gold">{{ physicalGbTotal }}<span class="unit">Gb</span></div>
             </div>
-            <div class="separator"></div>
+            <div class="plus-sign">+</div>
             <div class="result-item green-glow">
-              <span class="currency-label">Cash Gap</span>
+              <span class="currency-label">Cash Remainder</span>
               <div class="usd-value medium-emerald">${{ cashGapUSD }}</div>
             </div>
           </div>
@@ -287,5 +287,22 @@ ion-card {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+}
+.plus-sign {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--ion-color-medium);
+  margin: 0 8px;
+}
+.total-row {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ion-color-medium);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 8px 12px;
+  display: inline-block;
+  letter-spacing: 0.5px;
 }
 </style>

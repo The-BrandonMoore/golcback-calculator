@@ -34,19 +34,20 @@
           <div v-if="changeDueGB !== null" class="ion-margin-top" ref="changeResultCard">
             <div v-if="changeDueGB >= 0" class="ion-text-center">
               <div class="results-dashboard">
-                <h3 class="ion-text-center ion-no-margin ion-margin-bottom" style="font-size: 1.1em; color: var(--ion-color-medium); text-transform: uppercase; letter-spacing: 1px;">Change Due</h3>
+                <div class="total-row ion-margin-bottom">Total Change: {{ changeDueGB }} Gb</div>
                 <div class="values-container">
                   <div class="result-item gold-glow">
-                      <span class="currency-label">Goldbacks</span>
-                      <div class="gb-value large-gold">{{ changeDueGB }}<span class="unit">Gb</span></div>
+                      <span class="currency-label">Physical Goldbacks</span>
+                      <div class="gb-value large-gold">{{ physicalChangeGB }}<span class="unit">Gb</span></div>
                   </div>
-                  <div v-if="remainingChangeUSD" class="separator"></div>
+                  <div v-if="remainingChangeUSD" class="plus-sign">+</div>
                   <div v-if="remainingChangeUSD" class="result-item green-glow">
-                    <span class="currency-label">USD</span>
+                    <span class="currency-label">Cash Remainder</span>
                     <div class="usd-value medium-emerald">${{ remainingChangeUSD }}</div>
                   </div>
                 </div>
                 <div class="breakdown-header">Recommended Change Breakdown</div>
+                <div class="breakdown-header" style="margin-top: 0px; margin-bottom: 20px;">(In Goldbacks)</div>
                 <div class="chip-container ion-margin-bottom">
                     <ion-chip v-for="bill in changeBreakdown" :key="bill.label" :style="getBillStyle(bill.label)">
                     <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
@@ -105,12 +106,12 @@
               <div class="results-dashboard">
                 <div class="values-container">
                   <div class="result-item gold-glow">
-                    <span class="currency-label">Goldbacks</span>
-                    <div class="gb-value large-gold">{{ changeDueGB }}<span class="unit">Gb</span></div>
+                    <span class="currency-label">Physical Gold</span>
+                    <div class="gb-value large-gold">{{ physicalChangeGB }}<span class="unit">Gb</span></div>
                   </div>
-                  <div v-if="remainingChangeUSD" class="separator"></div>
+                  <div v-if="remainingChangeUSD" class="plus-sign">+</div>
                   <div v-if="remainingChangeUSD" class="result-item green-glow">
-                    <span class="currency-label">USD</span>
+                    <span class="currency-label">Cash Remainder</span>
                     <div class="usd-value medium-emerald">${{ remainingChangeUSD }}</div>
                   </div>
                 </div>
@@ -168,6 +169,12 @@ const changeDueGB = computed(() => {
     return Number(change.toFixed(2));
   }
   return null;
+});
+
+const physicalChangeGB = computed(() => {
+  if (!changeBreakdown.value) return 0;
+  const total = changeBreakdown.value.reduce((acc, item) => acc + (item.count * item.label), 0);
+  return Number(total.toFixed(2));
 });
 
 const totalGbNeeded = computed(() => {
@@ -486,5 +493,22 @@ watch(changeDueGB, (newValue) => {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+}
+.plus-sign {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--ion-color-medium);
+  margin: 0 8px;
+}
+.total-row {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ion-color-medium);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 8px 12px;
+  display: inline-block;
+  letter-spacing: 0.5px;
 }
 </style>
