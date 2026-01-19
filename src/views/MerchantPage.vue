@@ -73,7 +73,7 @@
               <div class="math-equation">
                 <span class="math-value">${{ Number(amountOwedUSD).toFixed(2) }}</span>
                 <span class="math-operator">/</span>
-                <span class="math-value">${{ dailyRate }}</span>
+                <span class="math-value rate-highlight">${{ dailyRate }}</span>
                 <span class="math-operator">=</span>
                 <span class="math-result">{{ totalGbNeeded }} Gb</span>
               </div>
@@ -88,7 +88,7 @@
                 <span class="math-operator">-</span>
                 <span class="math-value">{{ totalGbNeeded }} Gb</span>
                 <span class="math-operator">=</span>
-                <span class="math-result">{{ changeDueGB }} Gb</span>
+                <span class="math-result final-result">{{ changeDueGB }} Gb</span>
               </div>
               <div class="step-sublabel">Amount Paid  -  Amount Due  =  Change Due</div>
             </div>
@@ -403,23 +403,35 @@ ion-toolbar {
 }
 .math-equation {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   gap: 8px;
   font-family: 'Inter', monospace;
   font-size: 1.1rem;
   flex-wrap: wrap;
+  max-width: 400px;
+  margin: 0 auto;
 }
 .math-value {
   color: white;
   font-weight: 600;
 }
+.rate-highlight {
+  background: rgba(212, 175, 55, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+}
 .math-operator {
-  color: #D4AF37;
+  color: var(--ion-color-medium);
   font-weight: bold;
 }
 .math-result {
   color: #4CAF50;
   font-weight: 800;
+}
+.final-result {
+  font-size: 1.2em;
+  font-weight: 900;
 }
 </style>
