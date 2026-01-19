@@ -30,19 +30,22 @@
           <div v-if="changeDueGB !== null && amountOwedUSD && amountTenderedGB" class="ion-padding-top">
             <div v-if="changeDueGB >= 0" class="ion-text-center">
               <div class="results-dashboard">
-                <div class="result-item">
-                    <span class="currency-label">Goldbacks</span>
-                    <div class="gb-value large-gold">{{ changeDueGB }}<span class="unit">Gb</span></div>
-                    <div class="ion-margin-bottom ion-margin-top">
-                        <ion-chip v-for="bill in changeBreakdown" :key="bill.label" :style="getBillStyle(bill.label)">
-                        <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
-                        <ion-label style="color: white"><span class="gb-value">{{ bill.count }}</span> x <span class="gb-value">{{ bill.label }}</span></ion-label>
-                    </ion-chip>
-                    </div>
+                <div class="values-container">
+                  <div class="result-item gold-glow">
+                      <span class="currency-label">Goldbacks</span>
+                      <div class="gb-value large-gold">{{ changeDueGB }}<span class="unit">Gb</span></div>
+                  </div>
+                  <div v-if="remainingChangeUSD" class="separator"></div>
+                  <div v-if="remainingChangeUSD" class="result-item green-glow">
+                    <span class="currency-label">USD</span>
+                    <div class="usd-value medium-emerald">${{ remainingChangeUSD }}</div>
+                  </div>
                 </div>
-                <div v-if="remainingChangeUSD" class="result-item ion-margin-top">
-                  <span class="currency-label">USD</span>
-                  <div class="usd-value medium-emerald">${{ remainingChangeUSD }}</div>
+                <div class="ion-margin-bottom ion-margin-top">
+                    <ion-chip v-for="bill in changeBreakdown" :key="bill.label" :style="getBillStyle(bill.label)">
+                    <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
+                    <ion-label style="color: white"><span class="gb-value">{{ bill.count }}</span> x <span class="gb-value">{{ bill.label }}</span></ion-label>
+                </ion-chip>
                 </div>
               </div>
               <div class="ion-margin-top">
@@ -217,10 +220,31 @@ ion-toolbar {
   align-items: center;
   justify-content: center;
 }
+.values-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 8px;
+}
 .result-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 12px;
+  border-radius: 16px;
+}
+.gold-glow {
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0) 70%);
+}
+.green-glow {
+  background: radial-gradient(circle, rgba(46, 125, 50, 0.25) 0%, rgba(46, 125, 50, 0) 70%);
+}
+.separator {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.2), transparent);
 }
 .currency-label {
   font-size: 0.7rem;
@@ -242,6 +266,7 @@ ion-toolbar {
   color: #2E7D32;
   line-height: 1;
   font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 .unit {
   font-size: 0.5em;

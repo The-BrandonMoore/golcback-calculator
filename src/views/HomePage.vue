@@ -45,6 +45,21 @@
         </ion-card-content>
       </ion-card>
 
+      <div v-if="breakdown.length > 0" class="ion-padding-top">
+        <div class="results-dashboard">
+          <div class="result-item gold-glow">
+            <span class="currency-label">Physical Wallet</span>
+            <div class="gb-value large-gold">{{ gbAmount }}<span class="unit">Gb</span></div>
+          </div>
+          <div class="ion-margin-top ion-text-center">
+            <ion-chip v-for="item in breakdown" :key="item.label" :style="getBillStyle(item.label)">
+              <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
+              <ion-label><strong>{{ item.count }}</strong> x {{ item.label }} Gb</ion-label>
+            </ion-chip>
+          </div>
+        </div>
+      </div>
+
       <div class="ion-text-center">
         <p style="font-size: 0.8em; color: gray;">
           Market Price Last Sync: 10:00 AM MST
@@ -55,11 +70,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import {
   IonContent, IonHeader, IonPage, IonTitle, IonToolbar,
   IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
-  IonCardContent, IonItem, IonLabel, IonInput, IonIcon
+  IonCardContent, IonItem, IonLabel, IonInput, IonIcon, IonButton, IonButtons, IonChip
 } from '@ionic/vue';
 import { cashOutline, calculatorOutline } from 'ionicons/icons';
 import { swapVertical } from 'ionicons/icons';
@@ -68,6 +83,39 @@ import { swapVertical } from 'ionicons/icons';
 const dailyRate = ref(9.21); // Jan 2026 Rate
 const usdAmount = ref();
 const gbAmount = ref();
+
+const denominations = [50, 25, 10, 5, 1, 0.5];
+
+const breakdown = computed(() => {
+  if (!gbAmount.value) return [];
+  let remaining = parseFloat(gbAmount.value);
+  const result = [];
+  for (const bill of denominations) {
+    const count = Math.floor(remaining / bill);
+    if (count > 0) {
+      result.push({ label: bill, count });
+      remaining = remaining - (count * bill);
+      remaining = Number(remaining.toFixed(2));
+    }
+  }
+  return result;
+});
+
+const getBillStyle = (denomination: number) => {
+  const colors: Record<number, string> = {
+    50: '#D4AF37', // Gold
+    25: '#9C27B0', // Purple
+    10: '#009688', // Teal
+    5: '#F44336',  // Red
+    1: '#4CAF50',  // Green
+    0.5: '#757575' // Gray
+  };
+  return {
+    '--background': colors[denomination] || 'var(--ion-color-medium)',
+    '--color': 'white',
+    'font-weight': '600'
+  };
+};
 
 // Math Logic
 const convertToGoldback = () => {
@@ -103,5 +151,40 @@ ion-toolbar {
   border: 1px solid;
   border-image: linear-gradient(to bottom right, rgba(212, 175, 55, 0.3), transparent) 1;
   box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.results-dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.result-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  border-radius: 16px;
+}
+.gold-glow {
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0) 70%);
+}
+.currency-label {
+  font-size: 0.7rem;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+.large-gold {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #D4AF37;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.unit {
+  font-size: 0.5em;
+  margin-left: 2px;
+  opacity: 0.8;
 }
 </style>
