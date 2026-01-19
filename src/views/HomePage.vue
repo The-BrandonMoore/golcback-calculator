@@ -1,13 +1,13 @@
 <template>
   <ion-page>
     <ion-header :translucent="true">
-      <ion-toolbar color="warning">
-        <ion-title>Goldback Calculator</ion-title>
-        <ion-buttons slot="end">
-          <ion-button router-link="/tabs/merchant">
-              <ion-icon slot="icon-only" :icon="cashOutline"></ion-icon>
-          </ion-button>
-        </ion-buttons>
+      <ion-toolbar class="custom-toolbar">
+        <ion-title class="ion-text-center">
+          <div class="header-content">
+            <div class="main-title">Goldback Calculator</div>
+            <div class="subtitle">Live Conversion Rate: ${{ dailyRate }}</div>
+          </div>
+        </ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -170,9 +170,44 @@ ion-card {
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-ion-toolbar {
-  --background: #d4af37; /* Gold color */
-  --color: black;
+.custom-toolbar {
+  --background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+  --border-width: 0;
+  border-bottom: 2px solid;
+  border-image: linear-gradient(to right, #D4AF37, #F7EF8A) 1;
+  box-shadow: 0 1px 10px rgba(212, 175, 55, 0.4);
+  backdrop-filter: blur(10px);
+  --color: white;
+}
+.header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0;
+}
+.main-title {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  font-size: 1.4rem;
+  line-height: 1.2;
+  background: linear-gradient(to right, #D4AF37, #F7EF8A);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.subtitle {
+  font-size: 0.9rem;
+  color: #888;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+.merchant-btn {
+  --color: #D4AF37;
+  --border-color: #D4AF37;
+  --border-radius: 8px;
+  font-weight: 600;
+  margin-right: 8px;
 }
 .glassmorphism-card {
   background: rgba(30, 30, 30, 0.7);

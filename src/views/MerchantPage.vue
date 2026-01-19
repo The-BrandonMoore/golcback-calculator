@@ -1,8 +1,13 @@
 <template>
   <ion-page>
     <ion-header :translucent="true">
-      <ion-toolbar color="warning">
-        <ion-title>Merchant Register</ion-title>
+      <ion-toolbar class="custom-toolbar">
+        <ion-title class="ion-text-center">
+          <div class="header-content">
+            <div class="main-title">Merchant Register</div>
+            <div class="subtitle">{{ currentDate }}</div>
+          </div>
+        </ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -141,7 +146,7 @@ import {
   IonCardContent, IonItem, IonLabel, IonInput, IonList, IonChip, IonIcon, IonModal,
   createAnimation, toastController
 } from '@ionic/vue';
-import { cashOutline, copyOutline, receiptOutline } from 'ionicons/icons';
+import { cashOutline, copyOutline, receiptOutline, timeOutline } from 'ionicons/icons';
 import { Clipboard } from '@capacitor/clipboard';
 
 // Data State
@@ -150,6 +155,7 @@ const amountOwedUSD = ref();
 const amountTenderedGB = ref();
 const changeResultCard = ref<HTMLElement | null>(null);
 const isModalOpen = ref(false);
+const currentDate = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 
 const denominations = [100, 50, 25, 10, 5, 1, 0.5]; // Current Goldback bills
 
@@ -289,9 +295,37 @@ watch(changeDueGB, (newValue) => {
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-ion-toolbar {
-  --background: #d4af37; /* Gold color */
-  --color: black;
+.custom-toolbar {
+  --background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+  --border-width: 0;
+  border-bottom: 2px solid;
+  border-image: linear-gradient(to right, #D4AF37, #F7EF8A) 1;
+  box-shadow: 0 1px 10px rgba(212, 175, 55, 0.4);
+  backdrop-filter: blur(10px);
+  --color: white;
+}
+.header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0;
+}
+.main-title {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  font-size: 1.4rem;
+  line-height: 1.2;
+  background: linear-gradient(to right, #D4AF37, #F7EF8A);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.subtitle {
+  font-size: 0.9rem;
+  color: #888;
+  font-weight: 400;
+  letter-spacing: 0.5px;
 }
 .glassmorphism-card {
   background: rgba(30, 30, 30, 0.7);
