@@ -10,7 +10,7 @@ http://ionicframework.com/docs/theming/ */
 }
 
 .gb-value, .usd-value {
-  font-family: 'Inter', system-ui, sans-serif; /* High-end UI font */
+  font-family: 'Inter', 'SF Pro', -apple-system, system-ui, sans-serif;
   font-variant-numeric: tabular-nums lining-nums;
   font-weight: 600;
   letter-spacing: -0.02em;

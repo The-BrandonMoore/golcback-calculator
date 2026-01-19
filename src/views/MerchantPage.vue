@@ -10,7 +10,7 @@
     </ion-header>
 
     <ion-content :fullscreen="true" class="ion-padding">
-      <ion-card>
+      <ion-card class="glassmorphism-card">
         <ion-card-header>
           <ion-card-title>Merchant Register</ion-card-title>
           <ion-card-subtitle>Calculate Change in Goldbacks</ion-card-subtitle>
@@ -19,23 +19,26 @@
         <ion-card-content>
           <ion-item fill="outline" class="ion-margin-bottom">
             <ion-label position="stacked">Amount Owed ($)</ion-label>
-            <ion-input type="number" v-model="amountOwedUSD" @ionInput="calculateChange" placeholder="0.00"></ion-input>
+            <ion-input class="usd-value" type="number" v-model="amountOwedUSD" placeholder="0.00"></ion-input>
           </ion-item>
 
           <ion-item fill="outline" class="ion-margin-bottom">
             <ion-label position="stacked">Amount Tendered (Gb)</ion-label>
-            <ion-input type="number" v-model="amountTenderedGB" @ionInput="calculateChange" placeholder="0.00"></ion-input>
+            <ion-input class="gb-value" type="number" v-model="amountTenderedGB" placeholder="0.00"></ion-input>
           </ion-item>
 
           <div v-if="changeDueGB !== null && amountOwedUSD && amountTenderedGB" class="ion-padding-top">
             <div v-if="changeDueGB >= 0" class="ion-text-center">
-              <h2>Change Due: {{ changeDueGB }} Gb</h2>
-              <ion-list lines="none">
-                <ion-item v-for="bill in changeBreakdown" :key="bill.label">
-                  <ion-label>{{ bill.count }} x {{ bill.label }} Gb</ion-label>
-                </ion-item>
-                <ion-item v-if="remainingChangeUSD">
-                  <ion-label color="medium">Remaining Change in USD: ${{ remainingChangeUSD }}</ion-label>
+              <h2>Change Due: <span class="gb-value">{{ changeDueGB }}</span> Gb</h2>
+              <div class="ion-margin-bottom">
+                <ion-chip v-for="bill in changeBreakdown" :key="bill.label" :style="getBillStyle(bill.label)">
+                  <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
+                  <ion-label style="color: white"><span class="gb-value">{{ bill.count }}</span> x <span class="gb-value">{{ bill.label }}</span></ion-label>
+                </ion-chip>
+              </div>
+              <ion-list lines="none" v-if="remainingChangeUSD">
+                <ion-item>
+                  <ion-label color="medium">Remaining Change in USD: <span class="usd-value">${{ remainingChangeUSD }}</span></ion-label>
                 </ion-item>
               </ion-list>
             </div>
@@ -50,48 +53,47 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import {
   IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButtons, IonBackButton,
   IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
-  IonCardContent, IonItem, IonLabel, IonInput, IonList
+  IonCardContent, IonItem, IonLabel, IonInput, IonList, IonChip, IonIcon,
+  createAnimation
 } from '@ionic/vue';
+import { cashOutline } from 'ionicons/icons';
 
 // Data State
 const dailyRate = ref(9.21); // Jan 2026 Rate
 const amountOwedUSD = ref();
 const amountTenderedGB = ref();
-const changeDueGB = ref<number | null>(null);
-const changeBreakdown = ref<{label: number, count: number}[]>([]);
-const remainingChangeUSD = ref<string | null>(null);
+const changeResultCard = ref<HTMLElement | null>(null);
 
 const denominations = [50, 25, 10, 5, 1, 0.5]; // Current Goldback bills
 
-const calculateChange = () => {
+const changeDueGB = computed(() => {
   if (amountOwedUSD.value && amountTenderedGB.value) {
     const owedInGB = amountOwedUSD.value / dailyRate.value;
     const change = amountTenderedGB.value - owedInGB;
-    changeDueGB.value = Number(change.toFixed(2));
-
-    if (changeDueGB.value >= 0) {
-      const { breakdown, remaining } = calculateBills(changeDueGB.value);
-      changeBreakdown.value = breakdown;
-
-      if (remaining > 0) {
-        remainingChangeUSD.value = (remaining * dailyRate.value).toFixed(2);
-      } else {
-        remainingChangeUSD.value = null;
-      }
-    } else {
-      changeBreakdown.value = [];
-      remainingChangeUSD.value = null;
-    }
-  } else {
-    changeDueGB.value = null;
-    changeBreakdown.value = [];
-    remainingChangeUSD.value = null;
+    return Number(change.toFixed(2));
   }
-};
+  return null;
+});
+
+const billCalculation = computed(() => {
+  if (changeDueGB.value !== null && changeDueGB.value >= 0) {
+    return calculateBills(changeDueGB.value);
+  }
+  return { breakdown: [], remaining: 0 };
+});
+
+const changeBreakdown = computed(() => billCalculation.value.breakdown);
+
+const remainingChangeUSD = computed(() => {
+  if (billCalculation.value.remaining > 0) {
+    return (billCalculation.value.remaining * dailyRate.value).toFixed(2);
+  }
+  return null;
+});
 
 const calculateBills = (total: number) => {
   let remaining = total;
@@ -107,10 +109,43 @@ const calculateBills = (total: number) => {
   }
   return { breakdown, remaining };
 };
+
+const getBillStyle = (denomination: number) => {
+  const colors: Record<number, string> = {
+    50: '#D4AF37', // Gold
+    25: '#9C27B0', // Purple
+    10: '#009688', // Teal
+    5: '#F44336',  // Red
+    1: '#4CAF50',  // Green
+    0.5: '#757575' // Gray
+  };
+  return {
+    '--background': colors[denomination] || 'var(--ion-color-medium)',
+    '--color': 'white'
+  };
+};
+
+const playEntranceAnimation = async () => {
+  if (changeResultCard.value) {
+    const animation = createAnimation()
+      .addElement(changeResultCard.value)
+      .duration(200)
+      .fromTo('transform', 'scale(0.95)', 'scale(1)')
+      .fromTo('opacity', '0', '1');
+    await animation.play();
+  }
+};
+
+watch(changeDueGB, (newValue) => {
+  if (newValue !== null) {
+    nextTick(() => {
+      playEntranceAnimation();
+    });
+  }
+});
 </script>
 
-<style scoped>
-ion-card {
+<style scoped>ion-card {
   margin-top: 20px;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -118,5 +153,12 @@ ion-card {
 ion-toolbar {
   --background: #d4af37; /* Gold color */
   --color: black;
+}
+.glassmorphism-card {
+  background: rgba(30, 30, 30, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid;
+  border-image: linear-gradient(to bottom right, rgba(212, 175, 55, 0.3), transparent) 1;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
 </style>

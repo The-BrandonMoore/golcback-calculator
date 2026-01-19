@@ -13,7 +13,7 @@
 
     <ion-content :fullscreen="true" class="ion-padding">
       <!-- Standard Converter -->
-      <ion-card>
+      <ion-card class="glassmorphism-card">
         <ion-card-header>
           <ion-card-title>USD to Goldback</ion-card-title>
           <ion-card-subtitle>Daily Rate: ${{ dailyRate }}</ion-card-subtitle>
@@ -23,6 +23,7 @@
           <ion-item fill="outline" class="ion-margin-bottom">
             <ion-label position="stacked">USD Amount ($)</ion-label>
             <ion-input
+              class="usd-value"
               type="number"
               v-model="usdAmount"
               @ionInput="convertToGoldback"
@@ -34,6 +35,7 @@
           <ion-item fill="outline">
             <ion-label position="stacked">Goldback Total (Gb)</ion-label>
             <ion-input
+              class="gb-value"
               type="number"
               v-model="gbAmount"
               @ionInput="convertToUSD"
@@ -94,5 +96,12 @@ ion-card {
 ion-toolbar {
   --background: #d4af37; /* Gold color */
   --color: black;
+}
+.glassmorphism-card {
+  background: rgba(30, 30, 30, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid;
+  border-image: linear-gradient(to bottom right, rgba(212, 175, 55, 0.3), transparent) 1;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
 </style>
