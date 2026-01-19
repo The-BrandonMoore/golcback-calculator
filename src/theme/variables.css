@@ -1,2 +1,17 @@
 /* For information on how to create your own theme, please refer to:
 http://ionicframework.com/docs/theming/ */
+
+:root {
+  --ion-color-primary: #D4AF37;
+  --ion-color-success: #2E7D32;
+  --ion-background-color: #121212;
+  --ion-card-background: #1E1E1E;
+  --ion-text-color: #ffffff;
+}
+
+.gb-value, .usd-value {
+  font-family: 'Inter', system-ui, sans-serif; /* High-end UI font */
+  font-variant-numeric: tabular-nums lining-nums;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}

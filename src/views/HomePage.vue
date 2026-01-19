@@ -3,10 +3,16 @@
     <ion-header :translucent="true">
       <ion-toolbar color="warning">
         <ion-title>Goldback Calculator</ion-title>
+        <ion-buttons slot="end">
+          <ion-button router-link="/tabs/merchant">
+              <ion-icon slot="icon-only" :icon="cashOutline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true" class="ion-padding">
+      <!-- Standard Converter -->
       <ion-card>
         <ion-card-header>
           <ion-card-title>USD to Goldback</ion-card-title>
@@ -24,9 +30,6 @@
             ></ion-input>
           </ion-item>
 
-          <div class="ion-text-center ion-padding">
-            <ion-icon name="swap-vertical" size="large"></ion-icon>
-          </div>
 
           <ion-item fill="outline">
             <ion-label position="stacked">Goldback Total (Gb)</ion-label>
@@ -56,13 +59,13 @@ import {
   IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
   IonCardContent, IonItem, IonLabel, IonInput, IonIcon
 } from '@ionic/vue';
+import { cashOutline, calculatorOutline } from 'ionicons/icons';
 import { swapVertical } from 'ionicons/icons';
 
 // Data State
 const dailyRate = ref(9.21); // Jan 2026 Rate
 const usdAmount = ref();
 const gbAmount = ref();
-const denominations = [50, 25, 10, 5, 1, 0.5]; // Current Goldback bills
 
 // Math Logic
 const convertToGoldback = () => {
@@ -79,20 +82,6 @@ const convertToUSD = () => {
   } else {
     usdAmount.value = null;
   }
-};
-
-const calculateBills = (total: number) => {
-  let remaining = total;
-  const breakdown = [];
-
-  for (const bill of denominations) {
-    const count = Math.floor(remaining / bill);
-    if (count > 0) {
-      breakdown.push({ label: bill, count: count });
-      remaining = Number((remaining % bill).toFixed(2));
-    }
-  }
-  return breakdown;
 };
 </script>
 
