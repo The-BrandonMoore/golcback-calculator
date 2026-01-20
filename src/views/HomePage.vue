@@ -297,6 +297,10 @@ ion-card {
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
+.large-gold .gb-symbol-icon {
+  height: 0.85em;           /* Slightly smaller ratio for large displays */
+  vertical-align: -0.05em;  /* Less of a nudge needed at larger scales */
+}
 .medium-emerald {
   font-size: 1.8rem;
   font-weight: 700;
