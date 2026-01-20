@@ -5,7 +5,15 @@
         <ion-title class="ion-text-center">
           <div class="header-content">
             <div class="main-title">Goldback Calculator</div>
-            <div class="subtitle">Live Conversion Rate: ${{ dailyRate }}</div>
+            <div class="subtitle">
+              <span v-if="!isOffline">
+                Live Rate: ${{ dailyRate }} <ion-icon :icon="checkmarkCircle" color="success" style="vertical-align: text-bottom; font-size: 1.1em;"></ion-icon>
+              </span>
+              <span v-else style="color: var(--ion-color-warning);">
+                Offline: Using cached rate <ion-icon :icon="warningOutline" style="vertical-align: text-bottom;"></ion-icon>
+              </span>
+            </div>
+            <div class="last-updated" v-if="lastSyncedDate">Verified: {{ lastSyncedDate }}</div>
           </div>
         </ion-title>
       </ion-toolbar>
@@ -94,17 +102,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import {
   IonContent, IonHeader, IonPage, IonTitle, IonToolbar,
   IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
-  IonCardContent, IonItem, IonLabel, IonInput, IonIcon, IonButton, IonButtons, IonChip
+  IonCardContent, IonItem, IonLabel, IonInput, IonIcon, IonButton, IonChip
 } from '@ionic/vue';
-import { cashOutline, calculatorOutline, logoUsd, trashOutline } from 'ionicons/icons';
-import { swapVertical } from 'ionicons/icons';
+import { cashOutline, logoUsd, trashOutline, checkmarkCircle, warningOutline } from 'ionicons/icons';
+import { useGoldbackRate } from '../composables/useGoldbackRate'
 
 // Data State
-const dailyRate = ref(9.21); // Jan 2026 Rate
+const { dailyRate, lastSyncedDate, isOffline, syncOfficialRate } = useGoldbackRate();
+
 const usdAmount = ref();
 const gbAmount = ref();
 
@@ -182,6 +191,10 @@ const clearForm = () => {
   usdAmount.value = null;
   gbAmount.value = null;
 };
+
+onMounted(() => {
+  syncOfficialRate();
+});
 </script>
 
 <style scoped>
@@ -221,6 +234,11 @@ ion-card {
   color: #888;
   font-weight: 400;
   letter-spacing: 0.5px;
+}
+.last-updated {
+  font-size: 0.65rem;
+  color: #666;
+  margin-top: 2px;
 }
 .merchant-btn {
   --color: #D4AF37;

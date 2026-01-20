@@ -5,14 +5,22 @@
         <ion-title class="ion-text-center">
           <div class="header-content">
             <div class="main-title">Merchant Register</div>
-            <div class="subtitle">{{ currentDate }}</div>
+            <div class="subtitle">
+              <span v-if="!isOffline">
+                Live Rate: ${{ dailyRate }} <ion-icon :icon="checkmarkCircle" color="success" style="vertical-align: text-bottom; font-size: 1.1em;"></ion-icon>
+              </span>
+              <span v-else style="color: var(--ion-color-warning);">
+                Offline: Using cached rate <ion-icon :icon="warningOutline" style="vertical-align: text-bottom;"></ion-icon>
+              </span>
+            </div>
+            <div class="last-updated" v-if="lastSyncedDate">Verified: {{ lastSyncedDate }}</div>
           </div>
         </ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true" class="ion-padding">
-      <div class="main-viewport-container">
+      <div class="content-wrapper">
       <ion-card class="glassmorphism-card">
         <ion-card-header>
           <ion-card-title>Merchant Register</ion-card-title>
@@ -22,12 +30,12 @@
         <ion-card-content>
           <ion-item fill="outline" class="ion-margin-bottom">
             <ion-label position="stacked">Amount Owed ($)</ion-label>
-            <ion-input class="usd-value" type="number" v-model="amountOwedUSD" placeholder="0.00"></ion-input>
+            <ion-input class="usd-value" type="number" v-model="amountOwedUSD" @ionInput="calculateChange" placeholder="0.00"></ion-input>
           </ion-item>
 
           <ion-item fill="outline" class="ion-margin-bottom">
             <ion-label position="stacked">Amount Tendered (Gb)</ion-label>
-            <ion-input class="gb-value" type="number" v-model="amountTenderedGB" placeholder="0.00"></ion-input>
+            <ion-input class="gb-value" type="number" v-model="amountTenderedGB" @ionInput="calculateChange" placeholder="0.00"></ion-input>
           </ion-item>
 
           <div class="ion-text-center ion-margin-top" v-if="amountOwedUSD || amountTenderedGB">
@@ -39,7 +47,7 @@
         </ion-card-content>
       </ion-card>
 
-          <div v-if="changeDueGB !== null" class="ion-margin-top" ref="changeResultCard">
+          <div v-if="changeDueGB !== null" class="results-container" ref="changeResultCard">
             <div v-if="changeDueGB >= 0" class="ion-text-center">
               <div class="results-dashboard">
                 <div class="total-command-center">
@@ -144,36 +152,57 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue';
+import { ref, computed, watch, nextTick, onMounted } from 'vue';
 import {
   IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButtons, IonBackButton, IonButton,
   IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
   IonCardContent, IonItem, IonLabel, IonInput, IonList, IonChip, IonIcon, IonModal,
   createAnimation, toastController
 } from '@ionic/vue';
-import { cashOutline, copyOutline, receiptOutline, timeOutline, logoUsd, trashOutline } from 'ionicons/icons';
+import { cashOutline, copyOutline, receiptOutline, timeOutline, logoUsd, trashOutline, checkmarkCircle, warningOutline } from 'ionicons/icons';
 import { Clipboard } from '@capacitor/clipboard';
+import { useGoldbackRate } from '../composables/useGoldbackRate'
 
 // Data State
-const dailyRate = ref(9.21); // Jan 2026 Rate
+const { dailyRate, lastSyncedDate, isOffline, syncOfficialRate } = useGoldbackRate();
 const amountOwedUSD = ref();
 const amountTenderedGB = ref();
+const changeDueGB = ref<number | null>(null);
+const changeBreakdown = ref<{label: number, count: number}[]>([]);
+const remainingChangeUSD = ref<string | null>(null);
 const changeResultCard = ref<HTMLElement | null>(null);
 const isModalOpen = ref(false);
 const currentDate = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 
 const denominations = [100, 50, 25, 10, 5, 1, 0.5]; // Current Goldback bills
 
-const changeDueGB = computed(() => {
+const calculateChange = () => {
   const owed = amountOwedUSD.value;
   const tendered = amountTenderedGB.value;
   if (owed !== '' && owed !== null && owed !== undefined && tendered !== '' && tendered !== null && tendered !== undefined) {
     const owedInGB = Number(owed) / dailyRate.value;
     const change = Number(tendered) - owedInGB;
-    return Number(change.toFixed(2));
+    changeDueGB.value = Number(change.toFixed(2));
+
+    if (changeDueGB.value >= 0) {
+      const { breakdown, remaining } = calculateBills(changeDueGB.value);
+      changeBreakdown.value = breakdown;
+
+      if (remaining > 0) {
+        remainingChangeUSD.value = (remaining * dailyRate.value).toFixed(2);
+      } else {
+        remainingChangeUSD.value = null;
+      }
+    } else {
+      changeBreakdown.value = [];
+      remainingChangeUSD.value = null;
+    }
+  } else {
+    changeDueGB.value = null;
+    changeBreakdown.value = [];
+    remainingChangeUSD.value = null;
   }
-  return null;
-});
+};
 
 const physicalChangeGB = computed(() => {
   if (!changeBreakdown.value) return 0;
@@ -186,22 +215,6 @@ const totalGbNeeded = computed(() => {
     return (amountOwedUSD.value / dailyRate.value).toFixed(2);
   }
   return '0.00';
-});
-
-const billCalculation = computed(() => {
-  if (changeDueGB.value !== null && changeDueGB.value >= 0) {
-    return calculateBills(changeDueGB.value);
-  }
-  return { breakdown: [], remaining: 0 };
-});
-
-const changeBreakdown = computed(() => billCalculation.value.breakdown);
-
-const remainingChangeUSD = computed(() => {
-  if (billCalculation.value.remaining > 0) {
-    return (billCalculation.value.remaining * dailyRate.value).toFixed(2);
-  }
-  return null;
 });
 
 const calculateBills = (total: number) => {
@@ -254,47 +267,51 @@ const openSettlementModal = () => {
   isModalOpen.value = true;
 };
 
-const copyReceipt = async () => {
-  const date = new Date().toLocaleString();
-  let receiptText = `Goldback Transaction Receipt\n`;
-  receiptText += `Date: ${date}\n`;
-  receiptText += `Rate: $${dailyRate.value}/Gb\n`;
-  receiptText += `------------------------\n`;
-  receiptText += `Amount Owed: $${Number(amountOwedUSD.value).toFixed(2)}\n`;
-  receiptText += `Tendered: ${amountTenderedGB.value} Gb\n`;
-  receiptText += `Change Due: ${changeDueGB.value} Gb\n`;
+// Copy Receipt Functionality in case we decide to use it.
+// const copyReceipt = async () => {
+//   const date = new Date().toLocaleString();
+//   let receiptText = `Goldback Transaction Receipt\n`;
+//   receiptText += `Date: ${date}\n`;
+//   receiptText += `Rate: $${dailyRate.value}/Gb\n`;
+//   receiptText += `------------------------\n`;
+//   receiptText += `Amount Owed: $${Number(amountOwedUSD.value).toFixed(2)}\n`;
+//   receiptText += `Tendered: ${amountTenderedGB.value} Gb\n`;
+//   receiptText += `Change Due: ${changeDueGB.value} Gb\n`;
 
-  if (changeBreakdown.value.length > 0) {
-    receiptText += `\nBill Breakdown:\n`;
-    changeBreakdown.value.forEach(bill => {
-      receiptText += `- ${bill.count} x ${bill.label} Gb\n`;
-    });
-  }
+//   if (changeBreakdown.value.length > 0) {
+//     receiptText += `\nBill Breakdown:\n`;
+//     changeBreakdown.value.forEach(bill => {
+//       receiptText += `- ${bill.count} x ${bill.label} Gb\n`;
+//     });
+//   }
 
-  if (remainingChangeUSD.value) {
-    receiptText += `\nRemaining USD Change: $${remainingChangeUSD.value}\n`;
-  }
+//   if (remainingChangeUSD.value) {
+//     receiptText += `\nRemaining USD Change: $${remainingChangeUSD.value}\n`;
+//   }
 
-  receiptText += `------------------------\n`;
-  receiptText += `Calculated via Goldback Converter`;
+//   receiptText += `------------------------\n`;
+//   receiptText += `Calculated via Goldback Converter`;
 
-  await Clipboard.write({
-    string: receiptText
-  });
+//   await Clipboard.write({
+//     string: receiptText
+//   });
 
-  const toast = await toastController.create({
-    message: 'Receipt Copied to Clipboard',
-    duration: 2000,
-    position: 'bottom',
-    color: 'success'
-  });
+//   const toast = await toastController.create({
+//     message: 'Receipt Copied to Clipboard',
+//     duration: 2000,
+//     position: 'bottom',
+//     color: 'success'
+//   });
 
-  await toast.present();
-};
+//   await toast.present();
+// };
 
 const clearForm = () => {
   amountOwedUSD.value = null;
   amountTenderedGB.value = null;
+  changeDueGB.value = null;
+  changeBreakdown.value = [];
+  remainingChangeUSD.value = null;
 };
 
 watch(changeDueGB, (newValue) => {
@@ -304,9 +321,14 @@ watch(changeDueGB, (newValue) => {
     });
   }
 });
+
+onMounted(() => {
+  syncOfficialRate();
+});
 </script>
 
-<style scoped>ion-card {
+<style scoped>
+.ion-card {
   margin-top: 20px;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -342,6 +364,11 @@ watch(changeDueGB, (newValue) => {
   color: #888;
   font-weight: 400;
   letter-spacing: 0.5px;
+}
+.last-updated {
+  font-size: 0.65rem;
+  color: #666;
+  margin-top: 2px;
 }
 .glassmorphism-card {
   margin-bottom: 12px;
@@ -543,9 +570,12 @@ watch(changeDueGB, (newValue) => {
   --background-hover: rgba(220, 20, 60, 0.1);
   --background-activated: rgba(220, 20, 60, 0.1);
   text-shadow: 0 0 8px rgba(220, 20, 60, 0.4);
+  font-weight: 600;
 }
-.main-viewport-container {
-  display: block;
-  padding-bottom: 20px;
+.content-wrapper {
+  padding-bottom: 24px;
+}
+.results-container {
+  margin-top: 12px;
 }
 </style>
