@@ -42,7 +42,7 @@
 
 
           <ion-item fill="outline" class="ion-margin-bottom">
-            <ion-label position="stacked">Goldback Total (Gb)</ion-label>
+            <ion-label position="stacked">Goldback Total (<img src="/goldbackImage.webp" class="gb-symbol-icon" />)</ion-label>
             <ion-input
               class="gb-value"
               type="number"
@@ -69,7 +69,7 @@
           <div class="values-container">
             <div class="result-item gold-glow">
               <span class="currency-label">Physical Goldbacks</span>
-              <div class="gb-value large-gold">{{ physicalGbTotal.toFixed(2) }}<span class="unit">Gb</span></div>
+              <div class="gb-value large-gold"><img src="/goldbackImage.webp" class="gb-symbol-icon" />{{ physicalGbTotal.toFixed(2) }}</div>
             </div>
             <div class="plus-sign">+</div>
             <div class="result-item green-glow">
@@ -80,12 +80,12 @@
           <div class="breakdown-header">Suggested Payment Breakdown</div>
           <div class="chip-container">
             <ion-chip v-for="item in breakdown" :key="item.label" :style="getBillStyle(item.label)">
-              <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
-              <ion-label><strong>{{ item.count }}</strong> x {{ item.label }} Gb</ion-label>
+              <img src="/goldbackImage.webp" class="gb-symbol-icon" />
+              <ion-label><strong>{{ item.count }}</strong> x {{ item.label }}</ion-label>
             </ion-chip>
             <ion-chip v-if="cashGapUSD && parseFloat(cashGapUSD) > 0" class="cash-chip">
               <ion-icon :icon="logoUsd" style="color: white"></ion-icon>
-              <ion-label style="color: white"><span class="usd-value">${{ cashGapUSD }}</span> USD</ion-label>
+              <ion-label style="color: white"><span class="usd-value">{{ cashGapUSD }}</span> USD</ion-label>
             </ion-chip>
           </div>
         </div>
@@ -108,7 +108,7 @@ import {
   IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
   IonCardContent, IonItem, IonLabel, IonInput, IonIcon, IonButton, IonChip
 } from '@ionic/vue';
-import { cashOutline, logoUsd, trashOutline, checkmarkCircle, warningOutline } from 'ionicons/icons';
+import { logoUsd, trashOutline, checkmarkCircle, warningOutline } from 'ionicons/icons';
 import { useGoldbackRate } from '../composables/useGoldbackRate'
 
 // Data State
@@ -367,5 +367,11 @@ ion-card {
 .main-viewport-container {
   display: block;
   padding-bottom: 20px;
+}
+.gb-symbol-icon {
+  width: .9em;
+  height: .9em;
+  vertical-align: middle;
+  filter: brightness(0) saturate(100%) invert(84%) sepia(29%) saturate(836%) hue-rotate(3deg) brightness(91%) contrast(89%);
 }
 </style>

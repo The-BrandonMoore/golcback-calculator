@@ -34,7 +34,7 @@
           </ion-item>
 
           <ion-item fill="outline" class="ion-margin-bottom">
-            <ion-label position="stacked">Amount Tendered (Gb)</ion-label>
+            <ion-label position="stacked">Amount Tendered (<img src="/goldbackImage.webp" class="gb-symbol-icon" />)</ion-label>
             <ion-input class="gb-value" type="number" v-model="amountTenderedGB" @ionInput="calculateChange" placeholder="0.00"></ion-input>
           </ion-item>
 
@@ -51,14 +51,13 @@
             <div v-if="changeDueGB >= 0" class="ion-text-center">
               <div class="results-dashboard">
                 <div class="total-command-center">
-                  <div class="total-row">Total Change: <span class="total-value">{{ changeDueGB?.toFixed(2) }} Gb</span></div>
+                  <div class="total-row">Total Change: <span class="total-value"><img src="/goldbackImage.webp" class="gb-symbol-icon" />{{ changeDueGB?.toFixed(2) }}</span></div>
                 </div>
                 <div class="values-container">
                   <div class="result-item gold-glow">
                       <span class="currency-label">Physical Goldbacks</span>
-                      <div class="gb-value large-gold">{{ physicalChangeGB.toFixed(2) }}<span class="unit">Gb</span></div>
+                      <div class="gb-value large-gold"> <img src="/goldbackImage.webp" class="gb-symbol-icon" />{{ physicalChangeGB.toFixed(2) }}</div>
                   </div>
-                  <div v-if="remainingChangeUSD" class="plus-sign">+</div>
                   <div v-if="remainingChangeUSD" class="result-item green-glow">
                     <span class="currency-label">Cash Remainder</span>
                     <div class="usd-value medium-emerald">${{ remainingChangeUSD }}</div>
@@ -68,13 +67,13 @@
                 <div class="breakdown-header" style="margin-top: 0px; margin-bottom: 20px;">(In Goldbacks)</div>
                 <div class="chip-container ion-margin-bottom">
                     <ion-chip v-for="bill in changeBreakdown" :key="bill.label" :style="getBillStyle(bill.label)">
-                    <ion-icon :icon="cashOutline" style="color: white"></ion-icon>
-                    <ion-label style="color: white"><span class="gb-value">{{ bill.count }}</span> x <span class="gb-value">{{ bill.label }}</span></ion-label>
-                </ion-chip>
-                <ion-chip v-if="remainingChangeUSD && parseFloat(remainingChangeUSD) > 0" class="cash-chip">
-                    <ion-icon :icon="logoUsd" style="color: white"></ion-icon>
-                    <ion-label style="color: white"><span class="usd-value">${{ remainingChangeUSD }}</span> USD</ion-label>
-                </ion-chip>
+                      <img src="/goldbackImage.webp" class="gb-symbol-icon" style="margin-right: 5px"/>
+                      <ion-label style="color: white"> <span class="gb-value"> {{ bill.count }}</span> x <span class="gb-value">{{ bill.label }}</span></ion-label>
+                    </ion-chip>
+                    <ion-chip v-if="remainingChangeUSD && parseFloat(remainingChangeUSD) > 0" class="cash-chip">
+                      <ion-icon :icon="logoUsd" style="color: white"></ion-icon>
+                      <ion-label style="color: white"><span class="usd-value">{{ remainingChangeUSD }}</span></ion-label>
+                    </ion-chip>
                 </div>
               </div>
               <div class="ion-margin-top">
@@ -86,7 +85,7 @@
 
             </div>
             <div v-else class="ion-text-center">
-              <h3 style="color: var(--ion-color-danger);">Remaining Due: {{ Math.abs(changeDueGB) }} Gb</h3>
+              <h3 style="color: var(--ion-color-danger);">Remaining Due: <img src="/goldbackImage.webp" class="gb-symbol-icon" /> {{ Math.abs(changeDueGB) }}</h3>
             </div>
           </div>
       </div>
@@ -105,32 +104,29 @@
                 <span class="math-operator">/</span>
                 <span class="math-value rate-highlight">${{ dailyRate }}</span>
                 <span class="math-operator">=</span>
-                <span class="math-result">{{ totalGbNeeded }} Gb</span>
+                <span class="math-result"><img src="/goldbackImage.webp" class="gb-symbol-icon" />{{ totalGbNeeded }}</span>
               </div>
-              <div class="step-sublabel">Amount Owed / Rate = Total Gb Needed</div>
+              <div class="step-sublabel">Amount Owed / Rate = Total <img src="/goldbackImage.webp" class="gb-symbol-icon" /> Needed</div>
             </div>
-
-            <!-- Step 2 -->
+-
             <div class="step-section">
               <div class="step-label">Payment </div>
               <div class="math-equation">
-                <span class="math-value">{{ Number(amountTenderedGB).toFixed(2) }} Gb</span>
+                <span class="math-value"><img src="/goldbackImage.webp" class="gb-symbol-icon" />{{ Number(amountTenderedGB).toFixed(2) }}</span>
                 <span class="math-operator">-</span>
-                <span class="math-value">{{ totalGbNeeded }} Gb</span>
+                <span class="math-value"><img src="/goldbackImage.webp" class="gb-symbol-icon" />{{ totalGbNeeded }}</span>
                 <span class="math-operator">=</span>
-                <span class="math-result final-result">{{ changeDueGB?.toFixed(2) }} Gb</span>
+                <span class="math-result"><img src="/goldbackImage.webp" class="gb-symbol-icon" />{{ changeDueGB?.toFixed(2) }}</span>
               </div>
               <div class="step-sublabel">Amount Paid  -  Amount Due  =  Change Due</div>
             </div>
 
-            <!-- Step 3 -->
             <div class="step-section">
               <div class="step-label">Change Due</div>
-              <div class="results-dashboard">
                 <div class="values-container">
                   <div class="result-item gold-glow">
-                    <span class="currency-label">Physical Gold</span>
-                    <div class="gb-value large-gold">{{ physicalChangeGB.toFixed(2) }}<span class="unit">Gb</span></div>
+                    <span class="currency-label">Physical Goldbacks</span>
+                    <div class="gb-value large-gold"><img src="/goldbackImage.webp" class="gb-symbol-icon" />{{ physicalChangeGB.toFixed(2) }}</div>
                   </div>
                   <div v-if="remainingChangeUSD" class="plus-sign">+</div>
                   <div v-if="remainingChangeUSD" class="result-item green-glow">
@@ -139,7 +135,6 @@
                   </div>
                 </div>
               </div>
-            </div>
 
             <div class="ion-margin-top">
               <ion-button expand="block" color="primary" fill="outline" @click="isModalOpen = false">Close</ion-button>
@@ -159,7 +154,7 @@ import {
   IonCardContent, IonItem, IonLabel, IonInput, IonList, IonChip, IonIcon, IonModal,
   createAnimation, toastController
 } from '@ionic/vue';
-import { cashOutline, copyOutline, receiptOutline, timeOutline, logoUsd, trashOutline, checkmarkCircle, warningOutline } from 'ionicons/icons';
+import { copyOutline, receiptOutline, timeOutline, logoUsd, trashOutline, checkmarkCircle, warningOutline } from 'ionicons/icons';
 import { Clipboard } from '@capacitor/clipboard';
 import { useGoldbackRate } from '../composables/useGoldbackRate'
 
@@ -168,10 +163,10 @@ const { dailyRate, lastSyncedDate, isOffline, syncOfficialRate } = useGoldbackRa
 const amountOwedUSD = ref();
 const amountTenderedGB = ref();
 const changeDueGB = ref<number | null>(null);
-const changeBreakdown = ref<{label: number, count: number}[]>([]);
 const remainingChangeUSD = ref<string | null>(null);
 const changeResultCard = ref<HTMLElement | null>(null);
 const isModalOpen = ref(false);
+const changeBreakdown = ref<Array<{ label: number; count: number }>>([]);
 const currentDate = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 
 const denominations = [100, 50, 25, 10, 5, 1, 0.5]; // Current Goldback bills
@@ -577,5 +572,11 @@ onMounted(() => {
 }
 .results-container {
   margin-top: 12px;
+}
+.gb-symbol-icon {
+  width: .9em;
+  height: .9em;
+  vertical-align: middle;
+  filter: brightness(0) saturate(100%) invert(84%) sepia(29%) saturate(836%) hue-rotate(3deg) brightness(91%) contrast(89%);
 }
 </style>
