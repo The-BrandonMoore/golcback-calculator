@@ -12,6 +12,7 @@
     </ion-header>
 
     <ion-content :fullscreen="true" class="ion-padding">
+      <div class="main-viewport-container">
       <!-- Standard Converter -->
       <ion-card class="glassmorphism-card">
         <ion-card-header>
@@ -86,6 +87,7 @@
         <p style="font-size: 0.8em; color: gray;">
           Market Price Last Sync: 10:00 AM MST
         </p>
+      </div>
       </div>
     </ion-content>
   </ion-page>
@@ -229,6 +231,7 @@ ion-card {
   box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
 }
 .glassmorphism-card {
+  margin-bottom: 12px;
   background: rgba(30, 30, 30, 0.7);
   backdrop-filter: blur(12px);
   border: 1px solid;
@@ -342,5 +345,9 @@ ion-card {
   --background-hover: rgba(220, 20, 60, 0.1);
   --background-activated: rgba(220, 20, 60, 0.1);
   text-shadow: 0 0 8px rgba(220, 20, 60, 0.4);
+}
+.main-viewport-container {
+  display: block;
+  padding-bottom: 20px;
 }
 </style>

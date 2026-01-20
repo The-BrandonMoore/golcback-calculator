@@ -12,6 +12,7 @@
     </ion-header>
 
     <ion-content :fullscreen="true" class="ion-padding">
+      <div class="main-viewport-container">
       <ion-card class="glassmorphism-card">
         <ion-card-header>
           <ion-card-title>Merchant Register</ion-card-title>
@@ -80,6 +81,7 @@
               <h3 style="color: var(--ion-color-danger);">Remaining Due: {{ Math.abs(changeDueGB) }} Gb</h3>
             </div>
           </div>
+      </div>
 
 
       <ion-modal :is-open="isModalOpen" :breakpoints="[0, 0.9]" :initial-breakpoint="0.9" @didDismiss="isModalOpen = false" class="settlement-modal">
@@ -342,6 +344,7 @@ watch(changeDueGB, (newValue) => {
   letter-spacing: 0.5px;
 }
 .glassmorphism-card {
+  margin-bottom: 12px;
   background: rgba(30, 30, 30, 0.7);
   backdrop-filter: blur(12px);
   border: 1px solid;
@@ -540,5 +543,9 @@ watch(changeDueGB, (newValue) => {
   --background-hover: rgba(220, 20, 60, 0.1);
   --background-activated: rgba(220, 20, 60, 0.1);
   text-shadow: 0 0 8px rgba(220, 20, 60, 0.4);
+}
+.main-viewport-container {
+  display: block;
+  padding-bottom: 20px;
 }
 </style>
